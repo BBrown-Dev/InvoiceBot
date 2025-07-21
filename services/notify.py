@@ -16,6 +16,7 @@ def email_report(report_path: str):
         smtp_port = int(os.getenv("SMTP_PORT", 25))
         sender = os.getenv("EMAIL_FROM")
         recipient = os.getenv("EMAIL_TO")
+        smtp_pass = os.getenv("SMTP_PASS")
 
         msg = EmailMessage()
         msg["Subject"] = "Daily Invoice Summary"
@@ -33,6 +34,8 @@ def email_report(report_path: str):
             )
 
         with smtplib.SMTP(smtp_host, smtp_port) as smtp:
+            smtp.starttls()  # Initiate secure connection
+            smtp.login(sender, smtp_pass)  # If authentication is needed
             smtp.send_message(msg)
 
         logger.info(f"Sent summary email to {recipient}.")
