@@ -209,6 +209,8 @@ __marimo__/
 # Logs and reports
 output/
 reports/
+*.pdf
+*.csv
 
 # 📄 OS & editor artifacts
 .DS_Store
