@@ -61,7 +61,6 @@ def run_daily_workflow():
 
         # Step 6: Push metrics back to GitHub
         repo.push_metrics(successful=len(processed), total=len(files))
-
         logger.info("Workflow completed successfully.")
 
     except Exception as e:
