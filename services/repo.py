@@ -33,9 +33,6 @@ def push_metrics(successful: int, total: int):
         else:
             # No changes to commit
             print("No changes to commit.")
-        # subprocess.run(["git", "add", "metrics.txt"], check=True)
-        # subprocess.run(["git", "commit", "-m", msg], check=True)
-        # subprocess.run(["git", "push", "origin", "main"], check=True)
         logger.info("Metrics pushed to GitHub.")
     except subprocess.CalledProcessError:
         logger.exception("Failed to push metrics.")
