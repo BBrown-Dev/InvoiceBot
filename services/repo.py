@@ -21,9 +21,21 @@ def push_metrics(successful: int, total: int):
         # Write metrics.txt
         with open("metrics.txt", "w") as f:
             f.write(msg)
-        subprocess.run(["git", "add", "metrics.txt"], check=True)
-        subprocess.run(["git", "commit", "-m", msg], check=True)
-        subprocess.run(["git", "push", "origin", "main"], check=True)
+
+        # Stage changes
+        subprocess.run(["git", "add", "."], check=True)
+        # Check if there are staged changes
+        result = subprocess.run(["git", "diff", "--cached", "--quiet"])
+        if result.returncode != 0:
+            # There are changes to commit
+            subprocess.run(["git", "commit", "-m", msg], check=True)
+            subprocess.run(["git", "push"], check=True)
+        else:
+            # No changes to commit
+            print("No changes to commit.")
+        # subprocess.run(["git", "add", "metrics.txt"], check=True)
+        # subprocess.run(["git", "commit", "-m", msg], check=True)
+        # subprocess.run(["git", "push", "origin", "main"], check=True)
         logger.info("Metrics pushed to GitHub.")
     except subprocess.CalledProcessError:
         logger.exception("Failed to push metrics.")
