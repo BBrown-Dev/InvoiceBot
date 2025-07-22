@@ -1,0 +1,55 @@
+name: InvoiceBot Daily Run
+
+# Trigger on a schedule (6 AM UTC) and on pushes to main
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  push:
+    branches: [ main ]
+
+jobs:
+  run-automation:
+    runs-on: ubuntu-latest
+    env:
+      # If you ever want to override, but we’ll create .env from secrets below
+      PYTHONUNBUFFERED: 1
+
+    steps:
+      # 1. Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Set up Python
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. Synthesize a .env file from your GitHub Secrets
+      - name: Create .env file
+        run: |
+          echo "INVOICE_FOLDER=${{ secrets.INVOICE_FOLDER }}" >> .env
+          echo "PERSISTED_CSV=${{ secrets.PERSISTED_CSV }}" >> .env
+          echo "SUMMARY_CSV=${{ secrets.SUMMARY_CSV }}" >> .env
+          echo "SMTP_SERVER=${{ secrets.SMTP_SERVER }}" >> .env
+          echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
+          echo "EMAIL_FROM=${{ secrets.EMAIL_FROM }}" >> .env
+          echo "EMAIL_TO=${{ secrets.EMAIL_TO }}" >> .env
+
+      # 5. Run your Python workflow
+      - name: Run daily invoice workflow
+        run: python main.py
+
+      # 6. Upload the CSV reports & logs as artifacts for auditing
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: invoice-artifacts
+          path: |
+            ${{ secrets.PERSISTED_CSV }}
+            ${{ secrets.SUMMARY_CSV }}
+            metrics.txt
